@@ -1,29 +1,32 @@
 import { useState, useContext } from "react";
 import GithubContext from "../../context/github/GithubContext";
 import AlertContext from "../../context/alert/AlertContext";
+import { searchUsers } from "../../context/github/GithubAction";
 
 function UserSearch() {
   const [text, setText] = useState("");
 
-  const { users, searchUsers, clearSearch } = useContext(GithubContext);
+  const { users, dispatch } = useContext(GithubContext);
   const { setAlert } = useContext(AlertContext);
 
   const handleChange = (e) => {
     setText(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (text === "") {
       setAlert("Please enter something", "error");
     } else {
-      searchUsers(text);
+      dispatch({ type: "SET_LOADING" });
+      const users = await searchUsers(text);
+      dispatch({ type: "GET_USERS", payload: users });
       setText("");
     }
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 lg:grid-cols-2 md:grid-cols-2 mb-8 gap-8">
+    <div className="grid grid-cols-1 mb-8 gap-8 mx-20 max-sm:mx-5">
       <div>
         <form onSubmit={handleSubmit}>
           <div className="form-control">
@@ -37,7 +40,7 @@ function UserSearch() {
               />
               <button
                 type="submit"
-                className="absolute top-0 right-0 rounded-r-lg w-36 btn btn-lg"
+                className="absolute top-0 right-0 rounded-r-lg w-36 btn btn-lg max-sm:w-20"
               >
                 Go
               </button>
@@ -47,8 +50,11 @@ function UserSearch() {
       </div>
       {/* show the div when we have some users display */}
       {users.length > 0 && (
-        <div>
-          <button className="btn btn-ghost btn-lg" onClick={clearSearch}>
+        <div className="mx-auto">
+          <button
+            className="btn btn-ghost btn-lg"
+            onClick={() => dispatch({ type: "CLEAR_SEARCH" })}
+          >
             Clear
           </button>
         </div>

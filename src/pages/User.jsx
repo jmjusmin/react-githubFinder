@@ -4,16 +4,22 @@ import { useParams, Link } from "react-router-dom";
 import RepoList from "../components/repos/RepoList";
 import Spinner from "../components/layout/Spinner";
 import GithubContext from "../context/github/GithubContext";
+import { getUserAndRepos } from "../context/github/GithubAction";
 
 function User() {
-  const { getUser, user, repos, loading, getUserRepos } =
-    useContext(GithubContext);
+  const { user, repos, loading, dispatch } = useContext(GithubContext);
   const params = useParams();
 
   useEffect(() => {
-    getUser(params.login);
-    getUserRepos(params.login);
-  }, []);
+    dispatch({ type: "SET_LOADING" });
+
+    const getUserData = async () => {
+      const userData = await getUserAndRepos(params.login);
+      dispatch({ type: "GET_USER_AND_REPOS", payload: userData });
+    };
+
+    getUserData();
+  }, [dispatch, params.login]);
 
   //destructure user object
   const {
@@ -41,7 +47,7 @@ function User() {
     <>
       {/* create markup */}
       <div className="w-full mx-auto lg:w-10/12">
-        <div className="mb-4">
+        <div className="mb-6">
           <Link to="/" className="btn btn-ghost">
             Back to search
           </Link>
