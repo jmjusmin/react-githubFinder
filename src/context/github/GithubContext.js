@@ -10,6 +10,7 @@ export const GithubProvider = ({ children }) => {
   //create an initial state instead of useState
   const initialState = {
     users: [],
+    user: {},
     loading: false,
   };
 
@@ -55,6 +56,30 @@ export const GithubProvider = ({ children }) => {
     });
   };
 
+  //get signle user
+  const getUser = async (login) => {
+    //loading when call fetch
+    setLoading();
+
+    const res = await fetch(`${GITHUB_URL}/users/${login}`, {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+      },
+    });
+
+    //if response is error, then redirect to notfound page
+    if (res.status === 404) {
+      window.location = "/notfound";
+    } else {
+      const data = await res.json();
+
+      dispatch({
+        type: "GET_USER",
+        payload: data, //this is data from res
+      });
+    }
+  };
+
   //set loading
   const setLoading = () => {
     dispatch({ type: "SET_LOADING" });
@@ -69,8 +94,10 @@ export const GithubProvider = ({ children }) => {
     <GithubContext.Provider
       value={{
         users: state.users,
+        user: state.user,
         loading: state.loading,
         searchUsers,
+        getUser,
         clearSearch,
       }}
     >
