@@ -11,6 +11,7 @@ export const GithubProvider = ({ children }) => {
   const initialState = {
     users: [],
     user: {},
+    repos: [],
     loading: false,
   };
 
@@ -39,9 +40,11 @@ export const GithubProvider = ({ children }) => {
   const searchUsers = async (text) => {
     //loading when call fetch
     setLoading();
+
     const params = new URLSearchParams({
       q: text,
     });
+
     const res = await fetch(`${GITHUB_URL}/search/users?${params}`, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
@@ -80,6 +83,29 @@ export const GithubProvider = ({ children }) => {
     }
   };
 
+  //get user repos
+  const getUserRepos = async (login) => {
+    //loading when call fetch
+    setLoading();
+
+    const params = new URLSearchParams({
+      sort: "created",
+      per_page: 10,
+    });
+
+    const res = await fetch(`${GITHUB_URL}/users/${login}/repos?${params}`, {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+      },
+    });
+
+    const data = await res.json();
+
+    dispatch({
+      type: "GET_REPOS",
+      payload: data, //this is data from api
+    });
+  };
   //set loading
   const setLoading = () => {
     dispatch({ type: "SET_LOADING" });
@@ -93,11 +119,14 @@ export const GithubProvider = ({ children }) => {
   return (
     <GithubContext.Provider
       value={{
-        users: state.users,
-        user: state.user,
-        loading: state.loading,
+        // users: state.users,
+        // user: state.user,
+        // repos: state.repos,
+        // loading: state.loading,
+        ...state,
         searchUsers,
         getUser,
+        getUserRepos,
         clearSearch,
       }}
     >
