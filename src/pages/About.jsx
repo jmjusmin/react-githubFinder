@@ -3,11 +3,11 @@ import { FaGithub } from "react-icons/fa";
 function About() {
   return (
     <div className="ml-3">
-      <div className="flex content-center">
+      <div className="flex ">
         <h1 className="text-6xl mb-4 mr-8">Github Finder</h1>
         <a
           href="https://github.com/jmjusmin/react-githubFinder"
-          className="text-3xl text-red-600 hover:text-red-300"
+          className="text-3xl text-red-600 self-center hover:text-red-300"
         >
           <FaGithub />
         </a>
